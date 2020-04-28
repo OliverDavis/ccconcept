@@ -68,6 +68,13 @@
         let mean_x = d3.mean(data, d => d.x);
         let mean_y = d3.mean(data, d => d.y);
 
+        // Linear regression
+        let linearRegression = d3.regressionLinear()
+          .x(d => d.x)
+          .y(d => d.y);
+
+        let regression_summary = linearRegression(data);
+
         // Axis functions
         xAxis = g => g
           .attr("transform", `translate(0,${height - margin.bottom})`)
@@ -116,19 +123,29 @@
         const mean_x_base = height - margin.bottom - margin.top;
         const mean_x_place = x(mean_x);
         mark_mean_x = g => g
-    				.attr("transform", `translate(${mean_x_place},${margin.top})`)
-    				.append("path").attr("d",`M 0 0 L 0 ${mean_x_base}`)
-    				.attr("stroke","#333")
-    				.attr("shape-rendering", "crispEdges");
+  				.attr("transform", `translate(${mean_x_place},${margin.top})`)
+  				.append("path").attr("d",`M 0 0 L 0 ${mean_x_base}`)
+  				.attr("stroke","#333")
+  				.attr("shape-rendering", "crispEdges");
 
         // Mean of y
         const mean_y_base = width - margin.left - margin.right;
         const mean_y_place = y(mean_y);
         mark_mean_y = g => g
-    				.attr("transform", `translate(${margin.left},${mean_y_place})`)
-    				.append("path").attr("d",`M 0 0 L ${mean_y_base} 0`)
-    				.attr("stroke","#333")
-    				.attr("shape-rendering", "crispEdges");
+  				.attr("transform", `translate(${margin.left},${mean_y_place})`)
+  				.append("path").attr("d",`M 0 0 L ${mean_y_base} 0`)
+  				.attr("stroke","#333")
+  				.attr("shape-rendering", "crispEdges");
+
+        // Regression line
+        const line = d3.line().x(d => x(d[0])).y(d => y(d[1]));
+        const regression_line = line(regression_summary);
+        // const regression_line = d3.line()(regression_summary);
+        console.log(regression_line);
+        draw_regression_line = g => g
+          .append("path").attr("d",regression_line)
+          .attr("stroke","#aaa")
+          .attr("shape-rendering", "geometricPrecision");
 
         // Plot axes
         svg.append("g")
@@ -148,6 +165,10 @@
         // Plot mean of y
         svg.append("g")
           .call(mark_mean_y);
+
+        // Plot regression line
+        svg.append("g")
+          .call(draw_regression_line);
 
         // // Axis labels
         // svg.append("text")
