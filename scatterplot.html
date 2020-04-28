@@ -23,15 +23,130 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/d3-regression@1.3.4/dist/d3-regression.min.js"></script>
-    <script src="./js/scatterplot.js"></script>
+    <script src="./js/sctr.js"></script>
     <script>
 
+      // Set up plotting area
+      const width=600;
+      const height=600;
+      const margin = ({top: 30, right: 20, bottom: 40, left: 40});
+      const svg = d3.select("#plot-area");
+
       // Load data for x and y and wait for both
-      const y_promise = d3.csv("./data/covidCases_phw.csv");
-      const x_promise = d3.csv("./data/censusData_comm.csv");
+      const x_promise = d3.csv("./data/covidCases_phw.csv", function(d, i) {return {lad18nm: d.lad18nm, areaID: d.areaID, x: +d.value};});
+      const y_promise = d3.csv("./data/censusData_comm.csv", function(d, i) {return {lad18nm: d.lad18nm, areaID: d.areaID, y: +d.value};});
 
       Promise.all([x_promise, y_promise]).then( data => {
-        // sctr.draw("#plot-area");
+
+        let x_data, y_data;
+        [x_data, y_data] = data;
+
+        // Merge x and y into the same data frame
+        data = [];
+
+        if(x_data.length === y_data.length){
+          for (let i = 0; i < x_data.length; i++) {
+            let found = y_data.find(element => {return element.areaID === x_data[i].areaID});
+            data[i] = Object.assign(x_data[i], found);
+          }
+        } else {
+          console.log("Location arrays are inconsistent lengths.")
+        };
+
+        console.log(data);
+
+        // Set the x and y scales
+        let x = d3.scaleLinear()
+          .domain(d3.extent(data, d => d.x)).nice()
+          .range([margin.left, width - margin.right]);
+
+        let y = d3.scaleLinear()
+          .domain(d3.extent(data, d => d.y)).nice()
+          .range([height - margin.bottom, margin.top]);
+
+        // Axis functions
+        xAxis = g => g
+          .attr("transform", `translate(0,${height - margin.bottom})`)
+          .call(d3.axisBottom(x).ticks(width / 80))
+          .call(g => g.select(".domain").remove())
+          .call(g => g.append("text")
+            .attr("x", width)
+            .attr("y", margin.bottom - 4)
+            .attr("fill", "#000")
+            .attr("text-anchor", "end")
+            .text("Community risk →"))
+
+        yAxis = g => g
+          .attr("transform", `translate(${margin.left},0)`)
+          .call(d3.axisLeft(y))
+          .call(g => g.select(".domain").remove())
+          .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "#000")
+            .attr("text-anchor", "start")
+            .text("↑ Community support"))
+
+        // Grid function
+        grid = g => g
+          .attr("stroke", "currentColor")
+          .attr("stroke-opacity", 0.1)
+          .call(g => g.append("g")
+            .selectAll("line")
+            .data(x.ticks())
+            .join("line")
+              .attr("x1", d => 0.5 + x(d))
+              .attr("x2", d => 0.5 + x(d))
+              .attr("y1", margin.top)
+              .attr("y2", height - margin.bottom))
+          .call(g => g.append("g")
+            .selectAll("line")
+            .data(y.ticks())
+            .join("line")
+              .attr("y1", d => 0.5 + y(d))
+              .attr("y2", d => 0.5 + y(d))
+              .attr("x1", margin.left)
+              .attr("x2", width - margin.right));
+
+        // Plot axes
+        svg.append("g")
+          .call(xAxis);
+
+        svg.append("g")
+          .call(yAxis);
+
+        // Plot grid
+        svg.append("g")
+          .call(grid);
+
+        // // Axis labels
+        // svg.append("text")
+        //   .attr("transform", "translate(" + (width/2) + " ," + (height - 4) + ")")
+        //   .attr("fill", "#000")
+        //   .style("text-anchor", "middle")
+        //   .text("community risk");
+        //
+        // svg.append("text")
+        //   .attr("transform", "rotate(-90)")
+        //   .attr("y", 2)
+        //   .attr("x",0 - (height / 2))
+        //   .attr("dy", "1em")
+        //   .attr("fill", "#000")
+        //   .style("text-anchor", "middle")
+        //   .text("community support");
+
+        // Data points
+        svg.append("g")
+          .attr("stroke", "#505050")
+          .attr("stroke-width", 2)
+          .attr("fill", "#F5EF38")
+        .selectAll("circle")
+          .data(data)
+          .join("circle")
+          .attr("cx", d => x(d.x))
+          .attr("cy", d => y(d.y))
+          .attr("r", 5);
+
       });
 
     </script>
