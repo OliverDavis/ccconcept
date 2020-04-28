@@ -68,6 +68,46 @@
         let mean_x = d3.mean(data, d => d.x);
         let mean_y = d3.mean(data, d => d.y);
 
+        // Standard deviation of x and y
+        let sd_x = d3.deviation(data, d => d.x);
+        let sd_y = d3.deviation(data, d => d.y);
+
+        console.log(mean_x);
+        console.log(sd_x);
+
+        function z_score(d, mean, sd){
+          return (d - mean)/sd;
+        }
+
+        console.log(d3.deviation(data, d => z_score(d.x, mean_x, sd_x)));
+
+        // Colour scale
+        let colour_scale_values = data.map(
+          d => {
+            let zx = z_score(d.x, mean_x, sd_x);
+            let zy = z_score(d.y, mean_y, sd_y);
+            return zx - zy;
+          }
+        );
+
+        function getColourScale(values){
+
+          let xcs = d3.extent(values);
+
+          let colourScale = d3.scaleLinear()
+            .domain([xcs[0],
+              d3.mean(values),
+              xcs[1]])
+            .range(["#4575b4","#ffffbf","#d73027"])
+            // .range(["#2166ac","#f7f7f7","#b2182b"])
+            // .interpolate(d3.interpolateHcl);
+            .interpolate(d3.interpolateLab);
+
+          return colourScale;
+        }
+
+        let risk_colour = getColourScale(colour_scale_values);
+
         // Linear regression
         let linearRegression = d3.regressionLinear()
           .x(d => d.x)
@@ -189,14 +229,16 @@
         // Data points
         svg.append("g")
           .attr("stroke", "#505050")
-          .attr("stroke-width", 2)
-          .attr("fill", "#F5EF38")
+          .attr("stroke-width", 1.5)
         .selectAll("circle")
           .data(data)
           .join("circle")
           .attr("cx", d => x(d.x))
           .attr("cy", d => y(d.y))
-          .attr("r", 5);
+          .attr("r", 7)
+          .attr("fill", d => {return risk_colour(
+            (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
+          )});
 
       });
 
