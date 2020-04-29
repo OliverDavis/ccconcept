@@ -8,12 +8,17 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/scatterplot.css">
-
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="./js/mapbox-access-token.js"></script>
     <title>Scatterplot</title>
   </head>
   <body>
     <div id="content">
-      <svg id="plot-area">
+      <div id="map"></div>
+      <div id="sidebar">
+        <svg id="plot-area">
+      </div>
     </div>
 
     <!-- Optional JavaScript -->
@@ -27,8 +32,8 @@
     <script>
 
       // Set up plotting area
-      const width=600;
-      const height=600;
+      const width=380;
+      const height=380;
       const margin = ({top: 30, right: 20, bottom: 40, left: 40});
       const svg = d3.select("#plot-area");
 
@@ -94,6 +99,7 @@
 
           let xcs = d3.extent(values);
 
+          // ColorBrewer palette, interpolation in LAB for perceptual constancy
           let colourScale = d3.scaleLinear()
             .domain([xcs[0],
               d3.mean(values),
@@ -210,22 +216,6 @@
         svg.append("g")
           .call(draw_regression_line);
 
-        // // Axis labels
-        // svg.append("text")
-        //   .attr("transform", "translate(" + (width/2) + " ," + (height - 4) + ")")
-        //   .attr("fill", "#000")
-        //   .style("text-anchor", "middle")
-        //   .text("community risk");
-        //
-        // svg.append("text")
-        //   .attr("transform", "rotate(-90)")
-        //   .attr("y", 2)
-        //   .attr("x",0 - (height / 2))
-        //   .attr("dy", "1em")
-        //   .attr("fill", "#000")
-        //   .style("text-anchor", "middle")
-        //   .text("community support");
-
         // Data points
         svg.append("g")
           .attr("stroke", "#505050")
@@ -240,6 +230,32 @@
             (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
           )});
 
+      });
+
+      // Map
+      let map = new mapboxgl.Map({
+        container: 'map',
+        style: "mapbox://styles/oliverdavis/ck9lrtxag21wu1ipi0iyenklp",
+        center: [-3.766409, 52.33022],
+        zoom: 7
+      });
+
+      // Map boundaries data
+      const promiseLA = d3.json("./data/boundaries_LAs.geojson");
+
+      promiseLA.then(boundaries => {
+        map.on('load', function () {
+            map.addSource("boundaries_LAs", {type: "geojson", data: boundaries});
+            map.addLayer({
+              "id": "local_authorities",
+              "type": "fill",
+              "source": "boundaries_LAs",
+              "paint": {
+                'fill-color': '#088',
+                'fill-opacity': 0.8
+              }
+            });
+        });
       });
 
     </script>
