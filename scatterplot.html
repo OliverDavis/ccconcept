@@ -41,10 +41,13 @@
       const x_promise = d3.csv("./data/covidCases_phw.csv", function(d, i) {return {lad18nm: d.lad18nm, areaID: d.areaID, x: +d.value};});
       const y_promise = d3.csv("./data/censusData_comm.csv", function(d, i) {return {lad18nm: d.lad18nm, areaID: d.areaID, y: +d.value};});
 
-      Promise.all([x_promise, y_promise]).then( data => {
+      // Map boundaries data
+      const promiseLA = d3.json("./data/boundaries_LAs.geojson");
 
-        let x_data, y_data;
-        [x_data, y_data] = data;
+      Promise.all([x_promise, y_promise, promiseLA]).then( data => {
+
+        let x_data, y_data, boundaries;
+        [x_data, y_data, boundaries] = data;
 
         // Merge x and y into the same data frame
         data = [];
@@ -216,6 +219,22 @@
         svg.append("g")
           .call(draw_regression_line);
 
+        // Assign colours
+        data.forEach(d => d.colour = risk_colour(
+          (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
+        ));
+
+        boundaries.features.forEach(d => {
+          let matching_data = data.find(
+            element => {return element.areaID === d.properties.lad18cd}
+          );
+          d.properties.colour = matching_data.colour;
+        });
+
+        console.log(boundaries);
+
+        console.log(data);
+
         // Data points
         svg.append("g")
           .attr("stroke", "#505050")
@@ -226,24 +245,19 @@
           .attr("cx", d => x(d.x))
           .attr("cy", d => y(d.y))
           .attr("r", 7)
-          .attr("fill", d => {return risk_colour(
-            (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
-          )});
+          // .attr("fill", d => {return risk_colour(
+          //   (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
+          // )});
+          .attr("fill", d => d.colour);
 
-      });
+        // Map
+        let map = new mapboxgl.Map({
+          container: 'map',
+          style: "mapbox://styles/oliverdavis/ck9lrtxag21wu1ipi0iyenklp",
+          center: [-3.766409, 52.33022],
+          zoom: 7
+        });
 
-      // Map
-      let map = new mapboxgl.Map({
-        container: 'map',
-        style: "mapbox://styles/oliverdavis/ck9lrtxag21wu1ipi0iyenklp",
-        center: [-3.766409, 52.33022],
-        zoom: 7
-      });
-
-      // Map boundaries data
-      const promiseLA = d3.json("./data/boundaries_LAs.geojson");
-
-      promiseLA.then(boundaries => {
         map.on('load', function () {
             map.addSource("boundaries_LAs", {type: "geojson", data: boundaries});
             map.addLayer({
@@ -251,8 +265,8 @@
               "type": "fill",
               "source": "boundaries_LAs",
               "paint": {
-                'fill-color': '#088',
-                'fill-opacity': 0.8
+                'fill-color': ["get","colour"],
+                'fill-opacity': 0.6
               }
             });
         });
