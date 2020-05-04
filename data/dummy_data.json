@@ -1,0 +1,279 @@
+{
+  "variables": [
+    {
+      "name": "communityCohesion",
+      "label": "Community cohesion",
+      "class": "support"
+    },
+    {
+      "name": "deprivation_30",
+      "label": "Indices of multiple deprivation",
+      "class": "need"
+    },
+    {
+      "name": "vulnerable_pct",
+      "label": "Percentage vulnerable",
+      "class": "need"
+    },
+    {
+      "name": "pop_density",
+      "label": "Population density",
+      "class": "need"
+    },
+    {
+      "name": "pop_elderly",
+      "label": "Percentage elderly",
+      "class": "need"
+    },
+    {
+      "name": "covid_per100k",
+      "label": "COVID-19 cases per 100k",
+      "class": "need"
+    }
+  ],
+  "LAs": [
+    {
+      "lad18nm": "Blaenau Gwent",
+      "areaID": "W06000019",
+      "communityCohesion": 3.9679,
+      "deprivation_30": 64,
+      "vulnerable_pct": 39.1,
+      "pop_density": "641.2",
+      "pop_elderly": 19.9848,
+      "pop": "69,713",
+      "covid_per100k": 281.2
+    },
+    {
+      "lad18nm": "Bridgend",
+      "areaID": "W06000013",
+      "communityCohesion": 4.1195,
+      "deprivation_30": 40,
+      "vulnerable_pct": 43.1,
+      "pop_density": "577.8",
+      "pop_elderly": 20.2787,
+      "pop": "144,876",
+      "covid_per100k": 185.7
+    },
+    {
+      "lad18nm": "Caerphilly",
+      "areaID": "W06000018",
+      "communityCohesion": 3.9607,
+      "deprivation_30": 38,
+      "vulnerable_pct": 40.4,
+      "pop_density": "652.6",
+      "pop_elderly": 19.3306,
+      "pop": "181,019",
+      "covid_per100k": 239.8
+    },
+    {
+      "lad18nm": "Cardiff",
+      "areaID": "W06000015",
+      "communityCohesion": 3.9896,
+      "deprivation_30": 35,
+      "vulnerable_pct": 32.5,
+      "pop_density": "2,585.20",
+      "pop_elderly": 14.0945,
+      "pop": "364,248",
+      "covid_per100k": 338
+    },
+    {
+      "lad18nm": "Carmarthenshire",
+      "areaID": "W06000010",
+      "communityCohesion": 4.0097,
+      "deprivation_30": 27,
+      "vulnerable_pct": 47.4,
+      "pop_density": "79.1",
+      "pop_elderly": 23.464,
+      "pop": "187,568",
+      "covid_per100k": 165.3
+    },
+    {
+      "lad18nm": "Ceredigion",
+      "areaID": "W06000008",
+      "communityCohesion": 4.0957,
+      "deprivation_30": 7,
+      "vulnerable_pct": 46.2,
+      "pop_density": "40.9",
+      "pop_elderly": 24.9274,
+      "pop": "72,992",
+      "covid_per100k": 42.5
+    },
+    {
+      "lad18nm": "Conwy",
+      "areaID": "W06000003",
+      "communityCohesion": 4.1562,
+      "deprivation_30": 20,
+      "vulnerable_pct": 48.5,
+      "pop_density": "104.1",
+      "pop_elderly": 27.4396,
+      "pop": "117,181",
+      "covid_per100k": 71.7
+    },
+    {
+      "lad18nm": "Denbighshire",
+      "areaID": "W06000004",
+      "communityCohesion": 4.119,
+      "deprivation_30": 22,
+      "vulnerable_pct": 42.9,
+      "pop_density": "113.9",
+      "pop_elderly": 24.0837,
+      "pop": "95,330",
+      "covid_per100k": 142.7
+    },
+    {
+      "lad18nm": "Flintshire",
+      "areaID": "W06000005",
+      "communityCohesion": 4.042,
+      "deprivation_30": 20,
+      "vulnerable_pct": 41.2,
+      "pop_density": "355.6",
+      "pop_elderly": 20.9855,
+      "pop": "155,593",
+      "covid_per100k": 90
+    },
+    {
+      "lad18nm": "Gwynedd",
+      "areaID": "W06000002",
+      "communityCohesion": 4.236,
+      "deprivation_30": 8,
+      "vulnerable_pct": 40,
+      "pop_density": "49",
+      "pop_elderly": 22.686,
+      "pop": "124,178",
+      "covid_per100k": 90.2
+    },
+    {
+      "lad18nm": "Isle of Anglesey",
+      "areaID": "W06000001",
+      "communityCohesion": 4.0744,
+      "deprivation_30": 18,
+      "vulnerable_pct": 50,
+      "pop_density": "98.4",
+      "pop_elderly": 25.7172,
+      "pop": "69,961",
+      "covid_per100k": 55.7
+    },
+    {
+      "lad18nm": "Merthyr Tydfil",
+      "areaID": "W06000024",
+      "communityCohesion": 4.1519,
+      "deprivation_30": 50,
+      "vulnerable_pct": 32.3,
+      "pop_density": "540",
+      "pop_elderly": 18.6498,
+      "pop": "60,183",
+      "covid_per100k": 234.3
+    },
+    {
+      "lad18nm": "Monmouthshire",
+      "areaID": "W06000021",
+      "communityCohesion": 4.2062,
+      "deprivation_30": 5,
+      "vulnerable_pct": 39.4,
+      "pop_density": "110.9",
+      "pop_elderly": 24.8816,
+      "pop": "94,142",
+      "covid_per100k": 207.1
+    },
+    {
+      "lad18nm": "Neath Port Talbot",
+      "areaID": "W06000012",
+      "communityCohesion": 4.1844,
+      "deprivation_30": 45,
+      "vulnerable_pct": 49.5,
+      "pop_density": "323.8",
+      "pop_elderly": 20.6639,
+      "pop": "142,906",
+      "covid_per100k": 214.1
+    },
+    {
+      "lad18nm": "Newport",
+      "areaID": "W06000022",
+      "communityCohesion": 3.8755,
+      "deprivation_30": 40,
+      "vulnerable_pct": 36.6,
+      "pop_density": "804.6",
+      "pop_elderly": 17.2653,
+      "pop": "153,302",
+      "covid_per100k": 375.7
+    },
+    {
+      "lad18nm": "Pembrokeshire",
+      "areaID": "W06000009",
+      "communityCohesion": 4.0619,
+      "deprivation_30": 15,
+      "vulnerable_pct": 47.2,
+      "pop_density": "77.3",
+      "pop_elderly": 25.6927,
+      "pop": "125,055",
+      "covid_per100k": 107.2
+    },
+    {
+      "lad18nm": "Powys",
+      "areaID": "W06000023",
+      "communityCohesion": 4.1559,
+      "deprivation_30": 11,
+      "vulnerable_pct": 44.3,
+      "pop_density": "25.6",
+      "pop_elderly": 27.0108,
+      "pop": "132,447",
+      "covid_per100k": 82.3
+    },
+    {
+      "lad18nm": "Rhondda Cynon Taf",
+      "areaID": "W06000016",
+      "communityCohesion": 4.0352,
+      "deprivation_30": 45,
+      "vulnerable_pct": 38.5,
+      "pop_density": "566.1",
+      "pop_elderly": 19.1537,
+      "pop": "240,131",
+      "covid_per100k": 285.7
+    },
+    {
+      "lad18nm": "Swansea",
+      "areaID": "W06000011",
+      "communityCohesion": 3.9052,
+      "deprivation_30": 31,
+      "vulnerable_pct": 43,
+      "pop_density": "649.2",
+      "pop_elderly": 19.4952,
+      "pop": "246,466",
+      "covid_per100k": 269.8
+    },
+    {
+      "lad18nm": "Torfaen",
+      "areaID": "W06000020",
+      "communityCohesion": 3.9147,
+      "deprivation_30": 42,
+      "vulnerable_pct": 41.5,
+      "pop_density": "740.3",
+      "pop_elderly": 20.3903,
+      "pop": "93,049",
+      "covid_per100k": 255.8
+    },
+    {
+      "lad18nm": "Vale of Glamorgan",
+      "areaID": "W06000014",
+      "communityCohesion": 4.0644,
+      "deprivation_30": 19,
+      "vulnerable_pct": 42.6,
+      "pop_density": "399.2",
+      "pop_elderly": 20.9518,
+      "pop": "132,165",
+      "covid_per100k": 286
+    },
+    {
+      "lad18nm": "Wrexham",
+      "areaID": "W06000006",
+      "communityCohesion": 3.8806,
+      "deprivation_30": 28,
+      "vulnerable_pct": 41.3,
+      "pop_density": "270.2",
+      "pop_elderly": 19.8044,
+      "pop": "136,126",
+      "covid_per100k": 90.4
+    }
+  ],
+  "LSOAs": []
+}
