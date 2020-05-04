@@ -233,6 +233,31 @@
 
         console.log(data);
 
+        // Remember the latest linked map area
+        let linkedArea = null;
+
+        function handleMouseOver(d, i){
+          d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
+          linkedArea = map.querySourceFeatures("boundaries_LAs",{
+            filter: ["==",["get","lad18cd"], d.areaID]
+          })[0].id;
+          console.log(d.areaID);
+          console.log(linkedArea);
+          map.setFeatureState(
+            {source: "boundaries_LAs", id: linkedArea},
+            {hover: true}
+          );
+        }
+
+        function handleMouseOut(d, i){
+          d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
+          map.setFeatureState(
+            {source: "boundaries_LAs", id: linkedArea},
+            {hover: false}
+          );
+          linkedArea = null;
+        }
+
         // Data points
         svg.append("g")
           .attr("stroke", "#505050")
@@ -246,12 +271,29 @@
           .attr("cy", d => y(d.y))
           .attr("r", 7)
           .attr("fill", d => d.colour)
-          .on("mouseover", function(d, i){
-            d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
-          })
-          .on("mouseout", function(d, i){
-            d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
-          });
+          .on("mouseover", handleMouseOver)
+          .on("mouseout", handleMouseOut);
+          // .on("mouseover", function(d, i){
+          //   d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
+          //   let linkedArea = map.querySourceFeatures("boundaries_LAs",{
+          //     filter: ["==",["get","lad18cd"], d.areaID]
+          //   })[0].id;
+          //   console.log(d.areaID);
+          //   console.log(linkedArea);
+          //   map.setFeatureState(
+          //     {source: "boundaries_LAs", id: linkedArea},
+          //     {hover: true}
+          //   );
+          // })
+          // .on("mouseout", function(d, i){
+          //   console.log(linkedArea);
+          //   d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
+          //   map.setFeatureState(
+          //     {source: "boundaries_LAs", id: linkedArea},
+          //     {hover: false}
+          //   );
+          //   linkedArea = null;
+          // });
 
         // Map
         let map = new mapboxgl.Map({
@@ -261,7 +303,7 @@
           zoom: 7
         });
 
-        // Remember the latest hovered area
+        // Remember the latest hovered map area
         let hoveredArea = null;
 
         map.on('load', function () {
