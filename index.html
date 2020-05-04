@@ -242,50 +242,136 @@
         .selectAll("circle")
           .data(data)
           .join("circle")
+          .attr("id", d => d.areaID)
+          .attr("class", "datapoints")
           .attr("cx", d => x(d.x))
           .attr("cy", d => y(d.y))
           .attr("r", 7)
-          // .attr("fill", d => {return risk_colour(
-          //   (z_score(d.x, mean_x, sd_x) - z_score(d.y, mean_y, sd_y))
-          // )});
-          .attr("fill", d => d.colour);
+          .attr("fill", d => d.colour)
+          .on("mouseover", function(d, i){
+            d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
+          })
+          .on("mouseout", function(d, i){
+            d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
+          });
+
+        // // Data point interaction
+        // d3.selectAll("circle.datapoints").on("mouseover", d => {
+        //   // this.transition(50).attr("r", 12).attr("stroke-width", 2);
+        //   console.log(this);
+        // });
 
         // Map
         let map = new mapboxgl.Map({
           container: 'map',
-          // style: "mapbox://styles/oliverdavis/ck9lrtxag21wu1ipi0iyenklp",
-          style: "mapbox://styles/oliverdavis/ck9mmiu3r36wb1ipdyyfbi85z",
+          // style: "mapbox://styles/oliverdavis/ck9mmiu3r36wb1ipdyyfbi85z",
+          style: "mapbox://styles/oliverdavis/ck9q4pu7o5j4a1ipdqsxrusj2",
           center: [-3.766409, 52.33022],
           zoom: 7
         });
 
+        // Remember the latest hovered area
+        let hoveredArea = null;
+
         map.on('load', function () {
 
-          // // Find the index of the first symbol layer in the map style
-          // // so we can place colours beneath it
-          // let layers = map.getStyle().layers;
-          // let firstSymbolId;
-          // for (let i = 0; i < layers.length; i++) {
-          //   if (layers[i].type === 'symbol') {
-          //     firstSymbolId = layers[i].id;
-          //     break;
-          //   }
-          // }
-
-          // console.log(firstSymbolId);
-
-          map.addSource("boundaries_LAs", {type: "geojson", data: boundaries});
+          map.addSource("boundaries_LAs", {
+            "type": "geojson",
+            "data": boundaries,
+            "generateId": true
+          });
           map.addLayer({
             "id": "local_authorities",
             "type": "fill",
             "source": "boundaries_LAs",
+            "layout": {},
             "paint": {
               'fill-color': ["get","colour"],
-              // 'fill-opacity': 0.5
               'fill-opacity': ['interpolate', ["exponential", 3], ['zoom'], 7, 0.6, 11, 0.2]
-              // 'fill-opacity': ['interpolate', ["linear"], ['zoom'], 7, 0.6, 11, 0.2]
+              // 'fill-opacity': [
+              //   "case",
+              //   ["boolean", ["feature-state", "hover"], false],
+              //   ['interpolate', ["exponential", 3], ['zoom'], 7, 0.6, 11, 0.2],
+              //   0.8
+              // ]
             }
           }, "settlement-minor-label");
+
+          map.addLayer({
+            "id": "lA_borders",
+            "type": "line",
+            "source": "boundaries_LAs",
+            "layout": {},
+            "paint": {
+              "line-color": "#505050",
+              // "line-width": 1
+              "line-width": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                2,
+                0.5
+              ]
+            }
+          }, "settlement-minor-label");
+
+          // Hillshade layer (optional)
+          // map.addSource('dem', {'type': 'raster-dem','url': 'mapbox://mapbox.terrain-rgb'});
+          // map.addLayer({
+          //   'id': 'hillshading',
+          //   'source': 'dem',
+          //   'type': 'hillshade'
+          //   // insert below waterway-river-canal-shadow;
+          //   // where hillshading sits in the Mapbox Outdoors style
+          // }, 'waterway-shadow');
+
+          map.on('mouseover', "local_authorities", function(e) {
+      		// Change the cursor style as a UI indicator.
+      			map.getCanvas().style.cursor = 'pointer';
+      		});
+
+          map.on("mousemove", "local_authorities", function(e) {
+            if (e.features.length > 0) {
+              if (hoveredArea !== undefined) {
+                map.setFeatureState(
+                  {source: "boundaries_LAs", id: hoveredArea},
+                  {hover: false}
+                );
+                if(e.features[0].id != hoveredArea){
+                  d3.selectAll("circle.datapoints")
+                    .transition().duration(50)
+                    .attr("r", "7").attr("stroke-width", 1.5);
+                }
+              }
+              // hoveredArea = e.features[0].properties.lad18cd;
+              hoveredArea = e.features[0].id;
+              console.log(hoveredArea);
+              map.setFeatureState(
+                {source: "boundaries_LAs", id: hoveredArea},
+                {hover: true}
+              );
+              d3.select("circle#" + e.features[0].properties.lad18cd)
+                .transition().duration(50)
+                .attr("r", "12").attr("stroke-width", 2);
+            }
+            // console.log(e.features[0].properties.lad18cd);
+            // d3.select("circle#" + e.features[0].properties.lad18cd)
+            //   .attr("r", "10");
+          });
+
+          map.on('mouseleave', "local_authorities", function(e) {
+      			map.getCanvas().style.cursor = '';
+            if(hoveredArea !== undefined) {
+              map.setFeatureState(
+                {source: "boundaries_LAs", id: hoveredArea},
+                {hover: false}
+              );
+              d3.selectAll("circle.datapoints")
+                .transition().duration(50)
+                .attr("r", "7").attr("stroke-width", 1.5);
+            }
+            hoveredArea = null;
+      		});
+
         });
       });
 
