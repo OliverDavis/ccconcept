@@ -189,8 +189,6 @@
         // Regression line
         const line = d3.line().x(d => x(d[0])).y(d => y(d[1]));
         const regression_line = line(regression_summary);
-        // const regression_line = d3.line()(regression_summary);
-        console.log(regression_line);
         draw_regression_line = g => g
           .append("path").attr("d",regression_line)
           .attr("stroke","#aaa")
@@ -235,7 +233,33 @@
 
         console.log(data);
 
-        // Data points
+        // Remember the latest linked map area
+        let linkedArea = null;
+
+        // Mouse event handlers for graph
+        function handleMouseOver(d, i){
+          d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
+          linkedArea = map.querySourceFeatures("boundaries_LAs",{
+            filter: ["==",["get","lad18cd"], d.areaID]
+          })[0].id;
+          console.log(d.areaID);
+          console.log(linkedArea);
+          map.setFeatureState(
+            {source: "boundaries_LAs", id: linkedArea},
+            {hover: true}
+          );
+        }
+
+        function handleMouseOut(d, i){
+          d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
+          map.setFeatureState(
+            {source: "boundaries_LAs", id: linkedArea},
+            {hover: false}
+          );
+          linkedArea = null;
+        }
+
+        // Graph data points
         svg.append("g")
           .attr("stroke", "#505050")
           .attr("stroke-width", 1.5)
@@ -248,29 +272,18 @@
           .attr("cy", d => y(d.y))
           .attr("r", 7)
           .attr("fill", d => d.colour)
-          .on("mouseover", function(d, i){
-            d3.select(this).transition().duration(50).attr("r", 12).attr("stroke-width", 2);
-          })
-          .on("mouseout", function(d, i){
-            d3.select(this).transition().duration(50).attr("r", 7).attr("stroke-width", 1.5);
-          });
-
-        // // Data point interaction
-        // d3.selectAll("circle.datapoints").on("mouseover", d => {
-        //   // this.transition(50).attr("r", 12).attr("stroke-width", 2);
-        //   console.log(this);
-        // });
+          .on("mouseover", handleMouseOver)
+          .on("mouseout", handleMouseOut);
 
         // Map
         let map = new mapboxgl.Map({
           container: 'map',
-          // style: "mapbox://styles/oliverdavis/ck9mmiu3r36wb1ipdyyfbi85z",
           style: "mapbox://styles/oliverdavis/ck9q4pu7o5j4a1ipdqsxrusj2",
           center: [-3.766409, 52.33022],
           zoom: 7
         });
 
-        // Remember the latest hovered area
+        // Remember the latest hovered map area
         let hoveredArea = null;
 
         map.on('load', function () {
@@ -288,12 +301,6 @@
             "paint": {
               'fill-color': ["get","colour"],
               'fill-opacity': ['interpolate', ["exponential", 3], ['zoom'], 7, 0.6, 11, 0.2]
-              // 'fill-opacity': [
-              //   "case",
-              //   ["boolean", ["feature-state", "hover"], false],
-              //   ['interpolate', ["exponential", 3], ['zoom'], 7, 0.6, 11, 0.2],
-              //   0.8
-              // ]
             }
           }, "settlement-minor-label");
 
@@ -304,7 +311,6 @@
             "layout": {},
             "paint": {
               "line-color": "#505050",
-              // "line-width": 1
               "line-width": [
                 "case",
                 ["boolean", ["feature-state", "hover"], false],
@@ -342,9 +348,7 @@
                     .attr("r", "7").attr("stroke-width", 1.5);
                 }
               }
-              // hoveredArea = e.features[0].properties.lad18cd;
               hoveredArea = e.features[0].id;
-              console.log(hoveredArea);
               map.setFeatureState(
                 {source: "boundaries_LAs", id: hoveredArea},
                 {hover: true}
@@ -353,9 +357,6 @@
                 .transition().duration(50)
                 .attr("r", "12").attr("stroke-width", 2);
             }
-            // console.log(e.features[0].properties.lad18cd);
-            // d3.select("circle#" + e.features[0].properties.lad18cd)
-            //   .attr("r", "10");
           });
 
           map.on('mouseleave', "local_authorities", function(e) {
